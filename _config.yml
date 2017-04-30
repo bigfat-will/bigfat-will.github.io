@@ -1,4 +1,4 @@
-# Site settings
+﻿# Site settings
 title: Will Blog
 SEOTitle: Will Blog | Bigfat
 header-img: img/home-bg.jpg
@@ -6,7 +6,7 @@ email: wuxiao@smallfat.cn
 description: ""
 keyword: ""
 url: "https://blog.smallfat.cn"              # your host, for absolute URL
-baseurl: "/bigfat-blog"         # for example, '/blog' if your blog hosted on 'host/blog'
+baseurl: ""         # for example, '/blog' if your blog hosted on 'host/blog'
 
 
 
