@@ -46,23 +46,21 @@ kramdown:
 
 
 
-# Disqus settings
-#disqus_username: _your_disqus_short_name_
+# changyan
+changyan_appid: cysYLU9lq
+changyan_conf: prod_96ca18990b9fbba466581034321f90f7
 
-# Duoshuo settings
-duoshuo_username: huxblog
-# Share component is depend on Comment so we can NOT use share only.
-duoshuo_share: true                     # set to false if you want to use Comment without Sharing
-
-
+# uyan settings
+uyan_user_id: 2132614
+jiathis_share: true 
 
 
 # Analytics settings
 # Baidu Analytics
 ba_track_id: 3eec8acc68a60a8567bf493f7236a986
 # Google Analytics
-#ga_track_id: 'UA-49627206-1'            # Format: UA-xxxxxx-xx
-#ga_domain: huangxuan.me
+# ga_track_id: 'UA-49627206-1'            # Format: UA-xxxxxx-xx
+# ga_domain: huangxuan.me
 
 
 
@@ -75,12 +73,12 @@ sidebar-avatar: /img/avatar-hux.jpg      # use absolute URL, seeing it's used in
 
 # Featured Tags
 featured-tags: true                     # whether or not using Feature-Tags
-featured-condition-size: 1              # A tag will be featured if the size of it is more than this condition value
+featured-condition-size: 0              # A tag will be featured if the size of it is more than this condition value
 
 
 
 # Friends
-friends: [
+# friends: [
 #    {
 #        title: "AAA",
 #        href: "#"
@@ -94,4 +92,4 @@ friends: [
 #        title: "DDD",
 #        href: "#"
 #    }
-]
+# ]
