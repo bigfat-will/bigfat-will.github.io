@@ -5,6 +5,10 @@
 
 <!-- hack iOS CSS :active style -->
 <body ontouchstart="">
+	<!-- Image to hack wechat -->
+	<!--<img src="{{ site.url }}/img/icon_wechat.jpg" width="0" height="0" />-->
+	<!-- Migrate from head to bottom, no longer block render and still work -->
+	<img src="{{ site.url }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" style="width:0px;height:0px;position:absolute;" >
 
     {% include nav.html %}
 
@@ -13,10 +17,6 @@
     {% include footer.html %}
 
 
-<!-- Image to hack wechat -->
-<!--<img src="{{ site.url }}/img/icon_wechat.jpg" width="0" height="0" />-->
-<!-- Migrate from head to bottom, no longer block render and still work -->
-<img src="{{ site.url }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0" />
 </body>
 
 </html>
