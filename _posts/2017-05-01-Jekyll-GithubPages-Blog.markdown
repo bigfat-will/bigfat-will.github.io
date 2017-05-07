@@ -4,7 +4,7 @@ title:      "Jekyll/GithubPages-Blog 搭建"
 subtitle:   "个人Blog搭建过程，纪念下而已"
 date:       2017-05-01 
 author:     "Will"
-header-img: "img/jekyll/jekyll.png"
+header-img: "img/jekyll/jekyll.jpeg"
 catalog: true
 tags:
     - Jekyll
