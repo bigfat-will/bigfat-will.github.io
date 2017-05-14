@@ -1,0 +1,94 @@
+---
+layout:     post
+title:      "学习 SpringBoot - 01.HelloWord"
+subtitle:   "简单记录下SpringBoot"
+date:       2017-05-06 
+author:     "Will"
+header-img: "img/spring-boot/springboot001.png"
+catalog: true
+tags:
+    - Spring
+    - SpringBoot
+---
+
+> “walk beside you ”
+
+
+## 前言 
+
+　　以前看过一些**SpringBoot**的相关文档，但项目里面一直没有用到过，最近准备再整理下**SpringBoot**的知识。
+
+---
+
+## 正文
+
+　　**SpringBoot**的出现使得Spring应用在开发、配置、部署、监控等上面简化了许多，使得程序员们只关心Spring应用开发即可，无需再配置很多XML。
+SpringBoot提供了一系列的依赖包，所以需要构建工具的支持：maven 或 gradle。我这里使用的 maven ，gradle没接触过。
+
+#### 创建SpringBoot工程
+　　我们可以直接在[Spring官网](https://start.spring.io/)上面创建，选择对应的版本、构建工具、相关信息等，确认后即可生产对应的工程结构。
+或者我们可以自己创建： 
+* 使用Maven新建一个工程，目录结构就不多说了
+* pom 里 parent设为 spring-boot-starter-parent 例如：
+ ```
+        <parent>
+     		<groupId>org.springframework.boot</groupId>
+     		<artifactId>spring-boot-starter-parent</artifactId>
+     		<version>1.5.3.RELEASE</version>
+     	</parent>
+ ```
+* 添加应用需要的starter模块，就是添加所需要的依赖包。详见[Spring Boot的启动器Starter详解](http://blog.csdn.net/chszs/article/details/50610474)
+例如我们开发Web项目则需要添加**web starter模块**例如：
+ ```
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+ ```
+ * 创建一个Controller 例如：
+ ```
+         import org.springframework.boot.*;
+         import org.springframework.boot.autoconfigure.*;
+         import org.springframework.stereotype.*;
+         import org.springframework.web.bind.annotation.*;
+         
+         @Controller
+         @EnableAutoConfiguration
+         public class SampleController {
+         
+             @RequestMapping("/")
+             @ResponseBody
+             String home() {
+                 return "Hello World!";
+             }
+         
+             public static void main(String[] args) throws Exception {
+                 SpringApplication.run(SampleController.class, args);
+             }
+         }
+  ```
+   ```@EnableAutoConfiguration``` 根据字面意思得知是使用自动配置的意思，它会根据你的pom里设置的依赖来判断这是一个什么应用，并创建相应的环境。
+　
+ 
+　　到此为止一个简单的SpringBoot工程已经建好，直接运行这个main方法即可，默认是8080端口，直接访问```http://localhost:8080/```
+就能看到输出的```Hello World!```。
+ 
+#### SpringBoot的配置文件
+
+　　SpringBoot默认的配置文件为application.properties、application.yml，比如如果想修改访问的端口：
+* application.properties配置如下：
+ ```
+    server.port=9091
+ ```
+ * application.yml：
+  ```
+     server:
+       port: 9091
+  ```
+
+---
+## 后记
+
+　　这里就简单的介绍了下SpringBoot，没什么复杂的东西，也没有太多的配置，更不需要什么web容器，这就体现了SpringBoot的简洁之处。
+　
+
