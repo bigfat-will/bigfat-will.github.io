@@ -1,0 +1,108 @@
+---
+layout:     post
+title:      "java.lang.Object 中的公用方法"
+subtitle:   ""
+date:       2017-05-13 
+author:     "Will"
+header-img: "img/java/java.png"
+catalog: true
+tags:
+    - Java
+---
+
+> “walk beside you ”
+
+
+## 前言 
+
+　　记得以前有次面试，面试官问我**java.long.Object**中有多少公用方法。当时就有点蒙，从来没注意过这个最基本的类，
+只说出了**toString、equals、hashCode、getClass**这几个。。。。
+
+---
+
+## 正文
+
+　　**java.long.Object**这个类是所以Java类的祖先，每个类都使用 Object 作为超类。
+
+#### Object 中的方法
+　　在**java.long.Object**中的方法![java.long.Object](/img/java/java.long.Object.png)
+  
+* 创建并返回此对象的一个副本
+```
+public final native Class<?> getClass(); 
+``` 
+
+*  返回该对象的哈希码值
+```
+public native int hashCode(); 
+```  
+
+*   指示某个其他对象是否与此对象“相等”
+```
+public boolean equals(Object obj) {
+	return (this == obj);
+    } 
+``` 
+
+* 创建并返回此对象的一个副本
+```
+protected native Object clone() throws CloneNotSupportedException;
+```
+
+* 返回该对象的字符串表示 
+```
+public String toString() {
+	return getClass().getName() + "@" + Integer.toHexString(hashCode());
+    }
+```  
+
+*  唤醒在此对象监视器上等待的单个线程
+```
+public final native void notify();
+``` 
+
+* 唤醒在此对象监视器上等待的所有线程
+ ```
+ public final native void notifyAll();
+ ``` 
+
+* 导致当前的线程等待，直到其他线程调用此对象的 notify() 方法或 notifyAll() 方法，或者超过指定的时间量 
+```
+public final native void wait(long timeout) throws InterruptedException;
+``` 
+
+*  导致当前的线程等待，直到其他线程调用此对象的 notify() 方法或 notifyAll() 方法，或者其他某个线程中断当前线程，或者已超过某个实际时间量。
+```  
+public final void wait(long timeout, int nanos) throws InterruptedException {
+        if (timeout < 0) {
+            throw new IllegalArgumentException("timeout value is negative");
+        }
+
+        if (nanos < 0 || nanos > 999999) {
+            throw new IllegalArgumentException(
+                                "nanosecond timeout value out of range");
+        }
+
+        if (nanos >= 500000 || (nanos != 0 && timeout == 0)) {
+            timeout++;
+        }
+
+        wait(timeout);
+    }
+```
+
+*  导致当前的线程等待，直到其他线程调用此对象的 notify() 方法或 notifyAll() 方法。
+```    
+public final void wait() throws InterruptedException {
+           wait(0);
+   }
+``` 
+
+*   当垃圾回收器确定不存在对该对象的更多引用时，由对象的垃圾回收器调用此方法
+ ``` 
+ protected void finalize() throws Throwable { }
+ ```   
+
+---
+
+
