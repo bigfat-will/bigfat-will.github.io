@@ -8,7 +8,6 @@ header-img: "img/jekyll/jekyll.jpg"
 catalog: true
 tags:
     - Jekyll
-    - Blog
 ---
 
 > “walk beside you ”

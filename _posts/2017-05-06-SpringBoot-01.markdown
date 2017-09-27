@@ -7,7 +7,6 @@ author:     "Will"
 header-img: "img/spring-boot/springboot001.png"
 catalog: true
 tags:
-    - Spring
     - SpringBoot
 ---
 

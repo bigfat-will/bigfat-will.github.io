@@ -7,7 +7,6 @@ author:     "Will"
 header-img: "img/java/java.png"
 catalog: true
 tags:
-    - Java
     - Java设计模式
 ---
 
