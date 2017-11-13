@@ -1,0 +1,94 @@
+---
+layout:     post
+title:      "初步认识Docker"
+subtitle:   ""
+date:       2017-06-18
+author:     "Will"
+header-img: "img/docker/docker.jpg"
+catalog: true
+tags:
+    - Docker
+---
+
+> “walk beside you ”
+
+
+## 前言 
+
+　　不相信自己的人，连努力的价值都没有。
+                                ------  《火影忍者》
+
+---
+
+## 正文
+
+　　Docker 是一个开源的应用容器，使用Go语言开发。使用Docker我们可以把一些常用的软件，或者自己的项目
+打包成一个轻量级、可移植的容器中，这样可以再任意安装Docker的机器中使用，比如：我们把自己的项目打成一个容器，
+这样我们可以直接在多个不同的机器上下载这个容器执行，可以做到项目完全一致。
+
+优点：
+
+  * Docker容器启动非常快
+  * 容器性能开销极低，占用空间小
+  * 容器是完全使用沙箱机制，容器相互之间不会有任何接口
+  * 安装软件简单化。比如：Mysql、Nginx等，只需要运行相应的容器即可
+
+应用场景：
+
+  * Web 应用的自动化打包和发布
+  * 自动化测试和持续集成、发布
+  * 在服务型环境中部署和调整数据库或其他的后台应用
+
+## 安装 Docker
+
+这里我们介绍在Windows10、与CentOS 7.3 下的安装方式
+
+#### Windows 安装 Docker
+
+Windows下有两种方式来安装Docker (这里的安装包地址为阿里的镜像站，毕竟比国外官网速度快的多~)
+
+   * [docker-for-windows](https://mirrors.aliyun.com/docker-toolbox/windows/docker-for-windows/stable/)
+      这种方式只支持64位的Win10
+   * [docker-toolbox](https://mirrors.aliyun.com/docker-toolbox/windows/docker-toolbox/)
+
+只介绍下docker-for-windows：
+
+   1. 用下载好的安装包进行安装，首次启动如果电脑没有开启 **Hyper-V** ，则会提示开启。
+    ![Docker-install](/img/docker/docker-01.png)
+   2. 启动成功，图标栏会多出一条小鲸鱼，右键选择**Settings**
+   ![Docker-settings](/img/docker/docker-02.png)
+   3. 这里主要是Docker Daemon的虚拟环境的配置，包括：
+   * Shared Driver : 可以将本机Windows中的驱动器共享到Docker容器中
+   * Advanced：配置运行Docker Daemon的虚拟环境的CPU和内存
+   * Network：配置Docker的网络环境
+   * Proxies：代理的配置
+   * Docker Daemon：使用JSON格式的设置，对Docker Daemon进行配置，比如：镜像源等
+   4. 由于Docker需要Linux的运行环境所以 Docker for Windows的安装过程会在**Hyper-V**中创建一台用于运行Docker Daemon的Linux虚拟机，我们可以在
+   **Hyper-V管理器** 看到这个虚拟机![Docker-hyper-v](/img/docker/docker-03.png)
+   5. 在 cmd 中使用 ``` docker info``` 查看到Docker 信息，则安装成功
+#### 与CentOS 安装 Docker
+
+  1. 直接使用 ``` yum -y install docker ``` 进行安装即可
+  2. 安装完成后需启动服务 ``` service docker start ```
+  3. 使用 ``` docker info``` 查看到Docker 信息，则安装成功
+
+#### 安装 Nginx 容器
+
+  1. 在命令窗口使用命令 ``` docker search nginx ``` 来查找Nginx容器
+  2. 使用命令 ``` docker pull nginx:latest ``` 下载Nginx 容器![Docker-nginx](/img/docker/docker-nginx01.png)
+  3. 使用命令 ``` docker images ``` 查看下载的容器
+  4. 使用命令 ``` docker run -p 80:80 --name mynginx -d nginx ```来运行容器
+  * -p 80:80：将容器的80端口映射到主机的80端口
+  * --name mynginx：将容器命名为mynginx
+  * -d: 后台运行容器，并返回容器ID；
+  5. 通过浏览器访问主机IP 则可以看到运行的Nginx页面![Docker-nginx](/img/docker/docker-nginx02.png)
+
+---
+
+## 后记
+
+   这里只是简单的介绍了下怎么下载运行容器，docker 命令远比这些多，但都很简单，自己查找相关资料很快就能掌握
+
+   Docker 相关的 创建容器等，以后会补充上
+　　
+
