@@ -2,7 +2,7 @@
 layout:     post
 title:      "Java设计模式/6大原则"
 subtitle:   ""
-date:       2017-08-01
+date:       2017-09-03
 author:     "Will"
 header-img: "img/java/java.png"
 catalog: true
