@@ -1,0 +1,805 @@
+---
+layout:     post
+title:      "学习 SpringBoot - 02. My SpringBoot"
+subtitle:   "SpringBoot 点缀"
+date:       2018-08-25 
+author:     "Will"
+header-img: "img/spring-boot/springboot001.png"
+catalog: true
+tags:
+    - SpringBoot
+---
+
+> “walk beside you ”
+
+
+## 前言 
+
+　　最近又把SpringBoot 捡了起来....记录下...技术这东西，会忘的！
+
+---
+
+## 正文
+
+　　SpringBoot 集成了好多实用的功能，这里把我项目里用到的列举下。
+
+#### 创建SpringBoot工程
+　　参考我一前写的[Spring Boot](http://blog.smallfat.cn/2017/05/06/SpringBoot-01/)
+ 
+#### 添加DB
+
+　　这里使用的 **Mysql**，持久层使用**Mybatis**，链接池使用阿里的 **Druid** 
+* **pom.xml** 添加依赖 
+
+ ```
+ 
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.11</version>
+</dependency>
+<dependency>
+    <groupId>org.mybatis.spring.boot</groupId>
+    <artifactId>mybatis-spring-boot-starter</artifactId>
+    <version>1.3.0</version>
+</dependency>
+<dependency>
+    <groupId>com.alibaba</groupId>
+    <artifactId>druid-spring-boot-starter</artifactId>
+    <version>1.1.6</version>
+</dependency>
+
+ ```
+ 
+* 配置 **Mybatis** ：这里使用 generator 插件自动生产代码
+
+ 引入插件
+ 
+ ```
+ 
+<build>
+    <plugins>
+        <!-- mybatis generator 自动生成代码插件 -->
+        <plugin>
+            <groupId>org.mybatis.generator</groupId>
+            <artifactId>mybatis-generator-maven-plugin</artifactId>
+            <version>1.3.7</version>
+            <configuration>
+                <configurationFile>${basedir}/src/main/resources/generator/generatorConfig.xml</configurationFile>
+                <overwrite>true</overwrite>
+                <verbose>true</verbose>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+
+ ```
+ 
+ 配置 **generatorConfig.xml (略)**：需要注意我这里使用的mysql 8.0.11 所以 链接方式有些区别
+ 
+ ```
+<!--数据库链接URL，用户名、密码 -->
+<jdbcConnection driverClass="com.mysql.cj.jdbc.Driver" 
+    connectionURL="jdbc:mysql://localhost:3306/demo?serverTimezone=GMT%2B8&amp;useSSL=false&amp;characterEncoding=utf-8" 
+    userId="root"
+    password="root">
+</jdbcConnection>
+<!-- 	
+<jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://localhoost:3306/demo?useUnicode=true&amp;characterEncoding=utf-8" 
+    userId="root"
+    password="root">
+</jdbcConnection> 
+-->
+
+ ```
+  
+ 使用 Maven 构建  执行命令  **mvn mybatis-generator:generate -e**
+ 
+ ```
+ 
+ $  mvn mybatis-generator:generate -e
+ [INFO] Error stacktraces are turned on.
+ [INFO] Scanning for projects...
+ [INFO]
+ [INFO] --------------------< com.smallfat.demo:springboot >--------------------
+ [INFO] Building springboot 0.0.1-SNAPSHOT
+ [INFO] --------------------------------[ jar ]---------------------------------
+ [INFO]
+ [INFO] --- mybatis-generator-maven-plugin:1.3.7:generate (default-cli) @ springboot ---
+ [INFO] Connecting to the Database
+ [INFO] Introspecting table demo
+ [INFO] Generating Record class for table demo
+ [INFO] Generating Mapper Interface for table demo
+ [INFO] Generating SQL Map for table demo
+ [INFO] Saving file DemoMapper.xml
+ [INFO] Saving file Demo.java
+ [INFO] Saving file DemoMapper.java
+ [INFO] ------------------------------------------------------------------------
+ [INFO] BUILD SUCCESS
+
+ ``` 
+
+在 启动类添加 **@MapperScan("com.smallfat.demo.springboot.mapper")**  开启扫描对应的mybatis 方法
+
+ ```
+  @SpringBootApplication
+  @MapperScan("com.smallfat.demo.springboot.mapper")
+  public class Application {
+  	public static void main(String[] args) throws Exception {
+  		SpringApplication.run(Application.class, args);
+  	}
+  }
+  
+```
+
+  在 application.yml 中添加
+  
+ ```
+ 
+mybatis:
+  type-aliases-package: com.smallfat.demo.springboot.model        #mybatis 对应的 model
+  mapper-locations: classpath*:mapping/*.xml  #mybatis 对应的 mapping.xml 文件
+  
+ ```
+
+* 配置 **Druid** 
+
+  在 **application.yml** 中添加
+  
+ ```
+ 
+spring: 
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/demo?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
+      username: root
+      password: root
+      initial-size: 1
+      max-active: 20
+      max-wait: 600000
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      validation-query: SELECT 1 FROM DUAL
+      test-on-borrow: false
+      test-on-return: false
+      test-while-idle: true
+      min-evictable-idle-time-millis: 300000
+      filters: stat
+      stat-view-servlet:
+        loginUsername: druid
+        loginPassword: druid
+        url-pattern: /druid/*
+
+ ```
+
+这样完成了一个 **Mysql+Druid+Mybatis**
+
+#### 添加Redis
+
+有时我们需要缓存来提高系统的性能，经常会使用到redis
+
+* 引入依赖
+
+ ```
+ 
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+
+ ```
+ 
+* application.yml 添加配置
+
+ ```
+ 
+redis:
+host: 127.0.0.1
+port: 6379
+password:
+timeout: 3000 # 连接超时时间 单位 ms（毫秒）
+pool:
+  max-idle: 5 # 连接池中的最大空闲连接，默认值也是8
+  min-idle: 1 #连接池中的最小空闲连接，默认值也是0
+  max-active: 10 # 如果赋值为-1，则表示不限制；如果pool已经分配了maxActive个jedis实例，则此时pool的状态为exhausted(耗尽)
+  max-wait: 3000 # 等待可用连接的最大时间，单位毫秒，默认值为-1，表示永不超时。如果超过等待时间，则直接抛出JedisConnectionException
+  
+ ```
+ 
+* 使用的时候只需 注入 **RedisTemplate** 即可
+
+ ```
+ 
+ @Configuration
+ public class RedisUtil {
+     @Autowired
+     RedisTemplate redisTemplate;
+ 
+     /**
+      *
+      * @param key
+      * @param value
+      * @param liveTime
+      */
+     public void set(String key,Object value,Long liveTime){
+         if(liveTime == null){
+             redisTemplate.opsForValue().set(key,value);
+         }else{
+             redisTemplate.opsForValue().set(key,value,liveTime,TimeUnit.SECONDS);
+         }
+     }
+     /**
+      *
+      * @param key
+      * @return
+      */
+     public Object get(String key){
+         return redisTemplate.opsForValue().get(key);
+     }
+     /**
+      * 
+      * @param key
+      */
+     public void del(String key) {
+     	redisTemplate.delete(key);
+     }
+ 
+  ```
+
+* 如果我们想懒一点，可以使用 Spring 的 注解 cache
+
+这里需要修改下 **cacheManager（可以配置 key 的TTL）** 确保 cache 使用 redis、可以根据喜好 修改**wiselyKeyGenerator** **redisTemplate**
+
+注意需要添加  **@EnableCaching**
+
+
+  ```
+
+@Configuration
+@EnableCaching
+public class RedisConfig {
+
+	/**
+	 * 设置失效时间
+	 * 
+	 * @param redisTemplate
+	 * @return
+	 */
+	@Bean
+	public CacheManager cacheManager(RedisTemplate<?, ?> redisTemplate) {
+		RedisCacheManager cacheManager = new RedisCacheManager(redisTemplate);
+		cacheManager.setDefaultExpiration(600);
+		Map<String, Long> expiresMap = Maps.newHashMap();
+		expiresMap.put("demo:demo", 60L);
+		cacheManager.setExpires(expiresMap);
+		return cacheManager;
+
+	}
+
+	/**
+	 * 设置统一的生成key的方式
+	 * 
+	 * @return
+	 */
+	@Bean
+	public KeyGenerator wiselyKeyGenerator() {
+		return new KeyGenerator() {
+			@Override
+			public Object generate(Object target, Method method, Object... params) {
+				StringBuilder sb = new StringBuilder();
+				sb.append(target.getClass().getName());
+				sb.append("-");
+				sb.append(method.getName());
+				for (Object obj : params) {
+					sb.append(obj.toString());
+				}
+				return sb.toString();
+			}
+		};
+	}
+
+	/**
+	 * 设置统一序列化
+	 * 
+	 * @param factory
+	 * @return
+	 */
+	@Bean
+	public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory factory) {
+		StringRedisTemplate template = new StringRedisTemplate(factory);
+		Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<Object>(
+				Object.class);
+		ObjectMapper om = new ObjectMapper();
+		om.setSerializationInclusion(Include.NON_NULL);
+		om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+		om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+		jackson2JsonRedisSerializer.setObjectMapper(om);
+		template.setValueSerializer(jackson2JsonRedisSerializer);
+		template.afterPropertiesSet();
+		return template;
+	}
+
+}
+
+  ```
+ 
+ 然后在具体的方法上使用 注解
+ 
+  ```
+  
+ @Service
+ public class DemoServiceImpl implements IDemoService {
+ 	@Autowired
+ 	private DemoMapper demoMapper;
+ 	/**
+ 	 * 先判断 缓存有没有，没有则 db 获取，然后存入缓存
+ 	 */
+ 	@Override
+ 	@Cacheable(value="demo:demo",key="'demo:demo&id:' + #id")
+ 	public Demo get(int id) {
+ 		return demoMapper.selectByPrimaryKey(id);
+ 	}
+ 	/**
+ 	 * 不管缓存有没有，都 db 获取，然后存入缓存
+ 	 */
+ 	@Override
+ 	@CachePut(value="demo:demo",key="'demo:demo&id:' + #id")
+ 	public Demo put(int id) {
+ 		Demo demo = new Demo();
+ 		demo.setId(id);
+ 		demo.setName("new name");
+ 		demoMapper.updateByPrimaryKey(demo);
+ 		return demo;
+ 	}
+ 	/**
+ 	 * 删除缓存
+ 	 */
+ 	@Override
+ 	@CacheEvict(value="demo:demo",key="'demo:demo&id:' + #id")
+ 	public void del(int id) {
+ 		demoMapper.deleteByPrimaryKey(id);
+ 	}
+ 
+ }
+ 
+  ```
+ 
+#### Aop 
+
+ aop 是Spring 的一大功能点，程序里有时需要在方法执行前后添加日志，这时 aop 的功能能很好的体现
+ 
+ * 引入依赖
+ 
+  ```
+  
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-aop</artifactId>
+</dependency>
+
+  ```
+ 
+ * 逻辑代码： 注意 注解** @Aspect**
+ 
+ 这里实现的是在 controller 执行前后添加日志
+ 
+ 
+  ```
+  
+ @Aspect
+ @Component
+ public class LogAop {
+ 	private static Logger logger = LoggerFactory.getLogger(LogAop.class);
+ 
+ 	@Pointcut("execution(public *  com.smallfat.demo.springboot.controller..*.*(..))")
+ 	public void log() {
+ 	}
+ 
+ 	@Before("log()")
+ 	public void doBefore(JoinPoint joinPoint) throws Throwable {
+ 		logger.debug("doBefore");
+ 		// 接收到请求，记录请求内容
+ 		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+ 		HttpServletRequest request = attributes.getRequest();
+ 		logger.info("doBefore：    URL:{}   HTTP_METHOD:{}  IP:{}   Param :{}", request.getRequestURL().toString(),
+ 				request.getMethod(), HttpUtil.getIpAddr(request), HttpUtil.getParam(request).toString());
+ 
+ 	}
+ 
+ 	@Around("log()")
+ 	public Object around(ProceedingJoinPoint pjp) throws Throwable {
+ 		logger.debug("@Around 方法执行前");
+ 		Object obj = pjp.proceed();
+ 		logger.debug("@Around 方法执行后");
+ 		return obj;
+ 	}
+ 
+ 	@AfterReturning(returning = "ret", pointcut = "log()")
+ 	public void doAfterReturning(Object ret) throws Throwable {
+ 		logger.debug("doAfterReturning");
+ 		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+ 		HttpServletRequest request = attributes.getRequest();
+ 		logger.info("doAfter ：    URL:{}   HTTP_METHOD:{}  IP:{}   Param :{}  Res :{}", request.getRequestURL().toString(),
+ 				request.getMethod(), HttpUtil.getIpAddr(request), HttpUtil.getParam(request).toString(),
+ 				new ObjectMapper().writeValueAsString(ret));
+ 
+ 	}
+ }
+ 
+  ```
+  
+#### Interceptor
+ 
+ 拦截器可以拦截一些我们认为违法的请求，可以用于认证等
+ 
+ 
+ * 具体 Interceptor 方法
+ 
+  ```
+  
+ public class ApiInterceptor implements HandlerInterceptor {
+ 	private static Logger logger = LoggerFactory.getLogger(ApiInterceptor.class);
+ 	/**
+ 	 * 整个请求处理完毕回调方法，即在视图渲染完毕时回调，
+ 	 */
+ 	@Override
+ 	public void afterCompletion(HttpServletRequest arg0, HttpServletResponse arg1, Object arg2, Exception arg3)
+ 			throws Exception {
+ 	}
+ 	/**
+ 	 * 后处理回调方法，实现处理器的后处理（但在渲染视图之前）
+ 	 */
+ 	@Override
+ 	public void postHandle(HttpServletRequest arg0, HttpServletResponse arg1, Object arg2, ModelAndView arg3)
+ 			throws Exception {
+ 	}
+ 	/**
+ 	 * 预处理回调方法
+ 	 */
+ 	@Override
+ 	public boolean preHandle(HttpServletRequest arg0, HttpServletResponse arg1, Object arg2) throws Exception {
+ 		Map<String,String> map = HttpUtil.getParam(arg0);
+ 		logger.info("interceptor：    URL:{}   HTTP_METHOD:{}  IP:{}   Param :{}", arg0.getRequestURL().toString(),
+ 				arg0.getMethod(), HttpUtil.getIpAddr(arg0), HttpUtil.getParam(arg0).toString());
+ 		return true;
+ //		return false;
+ 	}
+ }
+ 
+  ```
+   
+   * 注册该 Interceptor
+   
+  ```
+
+   @Configuration
+   public class RegisterInterceptor extends WebMvcConfigurerAdapter {
+       @Override
+       public void addInterceptors(InterceptorRegistry registry) {
+           registry.addInterceptor(new ApiInterceptor()).addPathPatterns("/**");
+           super.addInterceptors(registry);
+       }
+   }
+ 
+  ```
+ 
+ 
+#### Exception 
+  
+  项目中时常会做异常的统一处理，在spring 中提供了 **ControllerAdvice** 可以很方便的处理异常
+  如下： 定义了， 校验参数不通过异常处理。和出现 Exception 的处理
+  
+  ```
+  
+  @ControllerAdvice
+  public class GlobalExceptionHandler {
+  	private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+  	
+      /**
+       * 参数 规则校验异常处理
+       * @Validated . 若验证不通过, 则会抛出BindException
+       * @param e
+       * @return
+       */
+      @ResponseBody
+      @ExceptionHandler(value = BindException.class)
+      public RespondModel bindException(BindException e) {
+          List<ObjectError> objectErrors = e.getBindingResult().getAllErrors();
+          StringBuffer sb = new StringBuffer("");
+          for (ObjectError error : objectErrors){
+              FieldError fieldError = (FieldError)error;
+              sb.append(fieldError.getField()).append(":").append(fieldError.getDefaultMessage()).append("; ");
+          }
+          ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+  		HttpServletRequest request = attributes.getRequest();
+          logger.error("请求缺失参数: IP{}   : {}",HttpUtil.getIpAddr(request),sb.toString());
+          return new RespondModel(ErrorNumEnum.FAIL, sb.toString(), null);
+      }
+      /**
+       * 参数 规则校验异常处理
+       * @Validated @RequestBody . 若验证不通过, 则会抛出MethodArgumentNotValidException
+       * @param e
+       * @return
+       */
+      @ResponseBody
+      @ExceptionHandler(value = MethodArgumentNotValidException.class)
+      public RespondModel bindException(MethodArgumentNotValidException e) {
+          List<ObjectError> objectErrors = e.getBindingResult().getAllErrors();
+          StringBuffer sb = new StringBuffer("");
+          for (ObjectError error : objectErrors){
+              FieldError fieldError = (FieldError)error;
+              sb.append(fieldError.getField()).append(":").append(fieldError.getDefaultMessage()).append("; ");
+          }
+          ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+  		HttpServletRequest request = attributes.getRequest();
+          logger.error("请求缺失参数: IP{}   : {}",HttpUtil.getIpAddr(request),sb.toString());
+          return new RespondModel(ErrorNumEnum.FAIL, sb.toString(), null);
+      }
+      
+  	 /**
+       * @param e
+       * @return
+       * @throws Exception
+       */
+  	@ResponseBody
+      @ExceptionHandler(value = Exception.class)
+      public RespondModel defaultErrorHandler(Exception e){
+  		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+  		HttpServletRequest request = attributes.getRequest();
+  		logger.error("Exception ：    URL:{}   HTTP_METHOD:{}  IP:{}   Param :{}", request.getRequestURL().toString(),
+  				request.getMethod(), HttpUtil.getIpAddr(request), HttpUtil.getParam(request).toString(),e);
+          return RespondModel.failed("", null);
+  
+      }
+  }
+  
+  ```
+ 
+ 
+#### 多环境
+
+
+系统一般都分为： **开发、测试、生产** ； 三个环节，所以配置文件分离至关重要；Spring 分环境配置非常简单
+
+
+ * 拆分配置文件： 分成application.yml 、 application-dev.yml 、application-test.yml、application-pro.yml
+ * 在  application.yml 指定激活那个环境的配置
+ 
+ 可以在配置里指定 如下，也可以在启动命令里指定如： java -jar demo.jar --spring.profiles.active=dev
+ 
+  ```
+  
+   #激活指定环境的配置文件
+   spring:
+     profiles:
+       active: dev
+       
+  ```
+ 
+#### Logback
+ 
+ Logback 是个很好的日志框架，也是Spring 自带的 日志框架，所以不需要引入依赖
+ 
+ * 系统默认会读取的配置文件：logback-spring.xml, 同样可以使用spring.profiles.active 来指定 环境
+ 
+ 如下： 其中log.lever , log.filePath 是我在配置文件中添加的，以对应不同的环境
+ 
+  ```
+  
+   log:
+     lever: info
+     filePath: /home/logs
+   
+  ```
+   
+  指定了开发环境、测试环境、生产环境的日志规则， 同时 <logger name="com.smallfat.demo.springboot.mapper" level="DEBUG"/>
+  用来打印Mybatis的 sql 日志
+  
+  ```
+  
+ <?xml version="1.0" encoding="UTF-8"?>
+ <configuration scan="true">
+ 	<!-- 定义参数 -->
+ 	<springProperty name="log.lever" source="log.lever"/>
+ 	<springProperty name="log.filePath" source="log.filePath"/>
+ 	<property name="log.maxHistory" value="365" />
+ 	<property name="log.pattern" value="%-12(%d{yyyy-MM-dd HH:mm:ss.SSS}) |-%-5level [%thread] %c [%L] -| %msg%n" />
+ 	<!--开发环境 -->
+ 	<springProfile name="dev">
+ 		<!-- 将日志打印到控制台 -->
+ 		<appender name="CONSOLE"
+ 			class="ch.qos.logback.core.ConsoleAppender">
+ 			<encoder>
+ 				<Pattern>${log.pattern}</Pattern>
+ 				<charset>UTF-8</charset>
+ 			</encoder>
+ 		</appender>
+ 		<!--myibatis log configure--> 
+ 		<logger name="com.smallfat.demo.springboot.mapper" level="DEBUG"/>
+ 		<root level="${log.lever}">
+ 			<appender-ref ref="CONSOLE"></appender-ref>
+ 		</root>
+ 	</springProfile>
+ 
+ 	<!--测试环境 -->
+ 	<!--生产环境 -->
+ 	<springProfile name="test,prd">
+ 		<!-- info -->
+ 		<appender name="infoAppender"
+ 			class="ch.qos.logback.core.rolling.RollingFileAppender">
+ 			<file>${log.filePath}/info.log</file>
+ 			<rollingPolicy
+ 				class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+ 				<!-- daily rollover 保存历史记录到这个文件夹一日起为后缀 -->
+ 				<fileNamePattern>${log.filePath}/info.%d{yyyy-MM-dd}.log
+ 				</fileNamePattern>
+ 				<!-- 文件最大保存历史数量 -->
+ 				<MaxHistory>${log.maxHistory}</MaxHistory>
+ 			</rollingPolicy>
+ 			<encoder>
+ 				<Pattern>${log.pattern}</Pattern>
+ 				<charset>UTF-8</charset>
+ 			</encoder>
+ 		</appender>
+ 		<!-- error -->
+ 		<appender name="errorAppender"
+ 			class="ch.qos.logback.core.rolling.RollingFileAppender">
+ 			<file>${log.filePath}/error.log</file>
+ 			<rollingPolicy
+ 				class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+ 				<!-- daily rollover 保存历史记录到这个文件夹一日起为后缀 -->
+ 				<fileNamePattern>${log.filePath}/error.%d{yyyy-MM-dd}.log
+ 				</fileNamePattern>
+ 				<!-- 文件最大保存历史数量 -->
+ 				<MaxHistory>${log.maxHistory}</MaxHistory>
+ 			</rollingPolicy>
+ 			<encoder>
+ 				<Pattern>${log.pattern}</Pattern>
+ 				<charset>UTF-8</charset>
+ 			</encoder>
+ 			<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+ 				<level>ERROR</level>
+ 			</filter>
+ 		</appender>
+ 		<root level="${log.lever}">
+ 			<appender-ref ref="infoAppender"></appender-ref>
+ 			<appender-ref ref="errorAppender"></appender-ref>
+ 		</root>
+ 	</springProfile>
+ </configuration>  
+ 
+  ```
+ 
+#### SpringBoot的监控
+ 
+ 生产环境中，需要实时或定期监控服务的可用性或一些其他的指标。Spring Boot 的actuator 提供了很多监控所需的接口
+ * 引入依赖
+ 
+  ```
+  
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+ 		
+  ```
+  
+  * 添加配置
+  
+  可以根据以下配置来查看系统信息
+  如： 访问 http://localhost:8070/management/health 来查看项目运行状况
+  
+  ```
+  
+endpoints:
+  shutdown:
+    enabled: true   #启用shutdown
+    sensitive: true  #开启shutdown的安全验证
+  mappings:
+    enabled: true
+    sensitive: true
+  autoconfig: #查看自动配置的使用情况
+    enabled: true
+    sensitive: true
+  configprops: #查看配置属性，包括默认配置
+    enabled: true
+    sensitive: true
+  beans: #查看bean及其关系列表
+    enabled: true
+    sensitive: true
+  dump: #打印线程栈
+    enabled: true
+    sensitive: true
+  env: #查看所有环境变量
+    enabled: true
+    sensitive: true
+  health:  #查看应用健康指标
+    enabled: true
+    sensitive: true
+  info:  #查看应用信息
+    enabled: true
+    sensitive: true
+  metrics:  #查看应用基本指标
+    enabled: true
+    sensitive: true
+  trace:  #查看基本追踪信息
+    enabled: true
+    sensitive: true
+ 
+  ```
+  
+#### 打包
+ 
+ 一般会将 Spring Boot项目打成jar 包使用 maven 插件：
+ 
+  ```
+  
+    <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+            <executable>true</executable>
+        </configuration>
+    </plugin>
+    
+  ```
+
+这种打包会把配置文件也一起打在jar中，使修改麻烦，所以一般会把配置文件放到与jar同目录的config文件下，这样项目启动是会优先读取该目录的配置
+使用 maven-resources-plugin 插件把 配置文件 copy 到 config 目录下
+
+  ```
+  
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-resources-plugin</artifactId>
+    <executions>
+        <execution>
+            <id>copy-resources</id>
+            <phase>validate</phase>
+            <goals>
+                <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+                <outputDirectory>${project.build.directory}/config</outputDirectory>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                </resources>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+
+  ```
+  
+#### 启动、停止
+ 
+ 以下命令在Linux ，打好的 jar文件目录下执行：
+ * 启动
+ 
+  ```
+ 
+nohup java -jar springboot-0.0.1-SNAPSHOT.jar --spring.profiles.active=test >> logs/out.log  2>&1 &
+echo "start ! "
+
+  ```
+ 
+ * 停止
+ 使用 spring boot 提供的** endpoints.shutdown ** 来停止， -u  admin:admin  是使用了 security 添加了请求时的密码校验
+ 
+  ```
+
+curl -u admin:admin -X POST http://127.0.0.1:8087/management/shutdown
+echo "" 
+
+  ```
+  
+---
+## 后记
+
+　　Spring Boot 大杂烩、记录下常用的功能..............  [代码](https://github.com/bigfat-will/springboot)
+　
+
