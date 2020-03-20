@@ -1,4 +1,4 @@
-﻿# Site settings
+# Site settings
 title: Will Blog
 SEOTitle: Will Blog | Bigfat
 header-img: img/home-bg.jpg
@@ -47,12 +47,12 @@ kramdown:
 
 
 # changyan
-changyan_appid: cysYLU9lq
-changyan_conf: prod_96ca18990b9fbba466581034321f90f7
+#changyan_appid: cysYLU9lq
+#changyan_conf: prod_96ca18990b9fbba466581034321f90f7
 
 # uyan settings
-uyan_user_id: 2132614
-jiathis_share: true 
+#uyan_user_id: 2132614
+#jiathis_share: false 
 
 
 # Analytics settings
