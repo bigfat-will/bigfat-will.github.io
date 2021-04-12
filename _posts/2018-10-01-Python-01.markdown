@@ -1,0 +1,122 @@
+---
+layout:     post
+title:      "Python 解释器"
+subtitle:   ""
+date:       2018-10-01
+author:     "Will"
+header-img: "img/python/python.jpg"
+catalog: true
+tags:
+    - Python
+    
+---
+
+> “walk beside you ”
+
+## 前言
+
+　　没有自信的人，连努力的价值都没有。
+                                ------  凯
+
+---
+
+## 正文
+
+　　当我们编写Python代码时，我们得到的是一个包含Python代码的以.py为扩展名的文本文件。要运行代码，就需要Python解释器去执行.py文件。
+　　由于整个Python语言从规范到解释器都是开源的，所以理论上，只要水平够高，任何人都可以编写Python解释器来执行Python代码（当然难度很大）。事实上，确实存在多种Python解释器。
+
+### 解释器
+
+* CPython ：
+    Python的官方版本，使用C语言实现，使用最为广泛，CPython实现会将源文件（py文件）转换成字节码文件（pyc文件），然后运行在Python虚拟机上。
+
+* Jyhton ：
+    Python的Java实现，Jython会将Python代码动态编译成Java字节码，然后在JVM上运行。
+* IronPython ：
+    Python的C#实现，IronPython将Python代码编译成C#字节码，然后在CLR上运行。（与Jython类似）
+* PyPy（特殊） ：
+    Python实现的Python，将Python的字节码字节码再编译成机器码。
+
+### Python环境
+
+#### 安装Python
+
+* windows：
+
+    1. 下载安装包 `https://www.python.org/downloads/`
+    2. 傻瓜式安装即可，默认选择添加环境变量（否则需要手动添加）
+    3. python -V  来验证 是否正确安装
+
+* linux：查看默认Python版本 `python -V`
+
+    1. 安装依赖环境:
+
+        ```
+            # yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel
+        ```
+
+    1. 下载Python3:
+
+        ```
+            # wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz
+        ```
+
+    1. 安装python3:
+
+        ```
+            安装在/usr/local/python3
+        　　创建目录：
+
+            # mkdir -p /usr/local/python3
+            解压文件
+            # tar -zxvf Python-3.6.1.tgz
+        ```
+
+    1. 进入解压后的目录，编译安装。（编译安装前需要安装编译器yum install gcc）
+
+        ```
+            cd Python-3.6.1
+            ./configure --prefix=/usr/local/python3   #/usr/local/python3为安装目录
+
+            make install    或者 make && make install
+        ```
+
+    1. 建立python3的软链
+
+        ```
+            # ln -s /usr/local/python3/bin/python3 /usr/bin/python3
+        ```
+
+    1. 并将/usr/local/python3/bin加入PATH
+
+        ```
+            vim ~/.bash_profile
+
+            .bash_profile
+            Get the aliases and functions
+            if [ -f ~/.bashrc ]; then
+            . ~/.bashrc
+            fi
+            # User specific environment and startup programs
+            PATH=$PATH:$HOME/bin:/usr/local/python3/bin
+            export PATH
+        ```
+　　
+    按ESC，输入:wq回车退出。
+    修改完记得执行行下面的命令，让上一步的修改生效：
+
+        ```
+        # source ~/.bash_profile
+        　　检查Python3及pip3是否正常可用：
+
+        # python3 -V
+        Python 3.6.1
+        # pip3 -V
+        pip 9.0.1 from /usr/local/python3/lib/python3.6/site-packages (python 3.6)
+
+        ```
+
+     1. 不行的话尝试创建一下pip3的软链接
+        ```
+            # ln -s /usr/local/python3/bin/pip3 /usr/bin/pip3
+        ```
